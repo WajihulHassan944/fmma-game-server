@@ -166,6 +166,37 @@ app.get('/match', async (req, res) => {
 
 
 
+
+// category start
+
+const categorySchema = new mongoose.Schema({
+  category: String
+});
+
+const Category = mongoose.model('Category', categorySchema);
+
+app.post('/addCategory', async (req, res) => {
+  
+  const { category } = req.body; // Destructure title and text from req.body
+
+  // Save the image URL, title, and text to the database
+  const newCategory = new Category({  category:category });
+  await newCategory.save();
+  res.status(200).send('Category Added Successfully');
+});
+
+
+
+
+app.get('/category', async (req, res) => {
+  const category = await Category.find();
+  res.send(category);
+});
+
+// category end
+
+
+
 app.get("/", (req, res) => {
   res.send("Backend server for fmma game has started running successfully...");
 });
