@@ -42,7 +42,7 @@ const fighterSchema = new mongoose.Schema({
   category: String
 });
 
-const Fighter = mongoose.model('Image', fighterSchema);
+const Fighter = mongoose.model('Fighter', fighterSchema);
 
 // Configure multer for file upload
 const storage = multer.memoryStorage();
