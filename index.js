@@ -102,8 +102,8 @@ app.delete('/blogtodelete/:id', async (req, res) => {
 
 // Define route for fetching images
 app.get('/images', async (req, res) => {
-  const fighters = await Fighter.find();
-  res.send(fighters);
+  const images = await Fighter.find();
+  res.send(images);
 });
 
 app.get("/", (req, res) => {
