@@ -35,6 +35,8 @@ mongoose.connect(MONGODB_URI, {
 });
 
 
+// fighters start
+
 const fighterSchema = new mongoose.Schema({
   url: String,
   name: String,
@@ -104,6 +106,65 @@ app.get('/fighters', async (req, res) => {
   const fighters = await Fighter.find();
   res.send(fighters);
 });
+
+// fighters end
+
+
+
+
+
+
+// match start
+
+const matchSchema = new mongoose.Schema({
+  url: String,
+  matchCategory: String,
+   matchFighterA: String , 
+   matchFighterB: String ,
+    matchName: String ,
+     matchDescription: String ,
+      matchVideoUrl: String , 
+      matchLive: String
+});
+
+const Match = mongoose.model('Match', matchSchema);
+
+app.post('/addMatch', upload.single('image'), async (req, res) => {
+  const formData = new FormData();
+  const { default: fetch } = await import('node-fetch');
+  formData.append('image', req.file.buffer.toString('base64'));
+
+  const response = await fetch('https://api.imgbb.com/1/upload?key=368cbdb895c5bed277d50d216adbfa52', {
+    method: 'POST',
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  const imageUrl = data.data.url;
+  const { matchCategory, matchFighterA , matchFighterB , matchName , matchDescription , matchVideoUrl , matchLive } = req.body; // Destructure title and text from req.body
+
+  // Save the image URL, title, and text to the database
+  const newMatch = new Match({ url: imageUrl, matchCategory:matchCategory, matchFighterA:matchFighterA , matchFighterB:matchFighterB , matchName:matchName , matchDescription:matchDescription , matchVideoUrl:matchVideoUrl , matchLive:matchLive });
+  await newMatch.save();
+  res.status(200).send('Match Added Successfully');
+});
+
+
+
+app.get('/match', async (req, res) => {
+  const match = await Match.find();
+  res.send(match);
+});
+
+// match end
+
+
+
+
+
+
+
 
 app.get("/", (req, res) => {
   res.send("Backend server for fmma game has started running successfully...");
