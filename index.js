@@ -197,6 +197,39 @@ app.get('/category', async (req, res) => {
 
 
 
+
+
+// combat start
+
+const combatSchema = new mongoose.Schema({
+  category: String,
+  attackName: String,
+  attackDamage: String,
+  attackKey: String
+});
+
+const Combat = mongoose.model('Combat', combatSchema);
+
+app.post('/addCombat', async (req, res) => {
+  
+  const { category, attackName, attackDamage, attackKey  }  = req.body;
+ 
+  const newCombat = new Combat({ category:category , attackName:attackName, attackDamage:attackDamage, attackKey:attackKey });
+  await newCombat.save();
+  res.status(200).send('Combat Added Successfully');
+});
+
+
+
+
+app.get('/combat', async (req, res) => {
+  const combat = await Combat.find();
+  res.send(combat);
+});
+
+// combat end
+
+
 app.get("/", (req, res) => {
   res.send("Backend server for fmma game has started running successfully...");
 });
