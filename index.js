@@ -177,10 +177,10 @@ const Category = mongoose.model('Category', categorySchema);
 
 app.post('/addCategory', async (req, res) => {
   
-  const category  = req.body.category; // Destructure title and text from req.body
-  console.log(category);
+  const categorys  = "wajih"; // Destructure title and text from req.body
+  console.log(categorys);
   // Save the image URL, title, and text to the database
-  const newCategory = new Category({ category:category });
+  const newCategory = new Category({ category:categorys });
   await newCategory.save();
   res.status(200).send('Category Added Successfully');
 });
