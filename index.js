@@ -213,7 +213,7 @@ const Combat = mongoose.model('Combat', combatSchema);
 app.post('/addCombat', async (req, res) => {
   
   const { category, attackName, attackDamage, attackKey  }  = req.body;
- 
+ console.log(category);
   const newCombat = new Combat({ category:category , attackName:attackName, attackDamage:attackDamage, attackKey:attackKey });
   await newCombat.save();
   res.status(200).send('Combat Added Successfully');
