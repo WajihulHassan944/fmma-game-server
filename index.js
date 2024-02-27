@@ -35,13 +35,14 @@ mongoose.connect(MONGODB_URI, {
 });
 
 
-const imageSchema = new mongoose.Schema({
+const fighterSchema = new mongoose.Schema({
   url: String,
-  title: String,
-  text: String
+  name: String,
+  description: String,
+  category: String
 });
 
-const Image = mongoose.model('Image', imageSchema);
+const Fighter = mongoose.model('Image', fighterSchema);
 
 // Configure multer for file upload
 const storage = multer.memoryStorage();
@@ -60,12 +61,12 @@ app.post('/upload', upload.single('image'), async (req, res) => {
   const data = await response.json();
 
   const imageUrl = data.data.url;
-  const { title, text } = req.body; // Destructure title and text from req.body
+  const { name, description , category } = req.body; // Destructure title and text from req.body
 
   // Save the image URL, title, and text to the database
-  const newImage = new Image({ url: imageUrl, title: title, text: text });
-  await newImage.save();
-  res.status(200).send('Blog uploaded successfully');
+  const newFighter = new Fighter({ url: imageUrl, name: name, description:description, category:category });
+  await newFighter.save();
+  res.status(200).send('Fighter Added Successfully');
 });
 
 
@@ -101,12 +102,12 @@ app.delete('/blogtodelete/:id', async (req, res) => {
 
 // Define route for fetching images
 app.get('/images', async (req, res) => {
-  const images = await Image.find();
+  const images = await Fighter.find();
   res.send(images);
 });
 
 app.get("/", (req, res) => {
-  res.send("Backend server for blogs images has started running successfully...");
+  res.send("Backend server for fmma game has started running successfully...");
 });
 
 const server = app.listen(PORT, () => {
