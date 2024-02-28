@@ -230,6 +230,92 @@ app.get('/combat', async (req, res) => {
 // combat end
 
 
+
+
+
+
+//admin login routes
+
+const bcrypt = require('bcrypt');
+
+const userSchema555 = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String
+});
+const Gameuser555 = new mongoose.model("Gameuser555", userSchema555);
+
+
+
+app.post('/admin/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await Gameuser555.findOne({ email: email });
+
+    if (user) {
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (passwordMatch) {
+        const objectId = user._id.toString();
+        res.status(200).json({ message: 'Login successful', objectId: objectId });
+      } else {
+        res.status(401).json({ message: 'Invalid password' });
+      }
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+// Registration endpoint
+app.post('/admin/register', async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    // Check if the email is already registered
+    const existingUser = await Gameuser555.findOne({ email: email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user
+    const newUser = new Gameuser555({
+      name: name,
+      email: email,
+      password: hashedPassword
+    });
+    await newUser.save();
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+/// end for admin
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.get("/", (req, res) => {
   res.send("Backend server for fmma game has started running successfully...");
 });
