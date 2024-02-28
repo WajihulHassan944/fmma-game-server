@@ -72,21 +72,6 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 });
 
 
-app.get('/blog/:objectId', async (req, res) => {
-  const { objectId } = req.params;
-
-  try {
-    const user = await Image.findById(objectId);
-    if (user) {
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ message: 'Blog not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
 
 app.delete('/fightertodelete/:id', async (req, res) => {
   const { id } = req.params;
@@ -100,6 +85,23 @@ app.delete('/fightertodelete/:id', async (req, res) => {
   }
 });
 
+app.put('/fightertoupdate/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, description, category } = req.body;
+
+  try {
+      const fighter = await Fighter.findByIdAndUpdate(id, { name, description, category }, { new: true });
+
+      if (!fighter) {
+          return res.status(404).json({ message: 'Fighter not found' });
+      }
+
+      res.status(200).json({ message: 'Fighter updated successfully', fighter });
+  } catch (error) {
+      console.error('Error updating fighter:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 app.get('/fighters', async (req, res) => {
