@@ -104,6 +104,26 @@ app.put('/fightertoupdate/:id', async (req, res) => {
 });
 
 
+
+
+app.get('/fighters/:objectId', async (req, res) => {
+  const { objectId } = req.params;
+
+  try {
+    const user = await Fighter.findById(objectId);
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: 'Fighter not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+
 app.get('/fighters', async (req, res) => {
   const fighters = await Fighter.find();
   res.send(fighters);
@@ -154,6 +174,61 @@ app.post('/addMatch', upload.single('image'), async (req, res) => {
 
 
 
+
+
+
+app.delete('/matchtodelete/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log('Received DELETE request for Match ID:', id);
+  try {
+    const match = await Match.findByIdAndDelete(id);
+    
+    res.status(200).json({ message: 'Match deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.put('/matchtoupdate/:id', async (req, res) => {
+  const { id } = req.params;
+  const { matchCategory, matchFighterA , matchFighterB , matchName , matchDescription  } = req.body;
+  try {
+      const match = await Match.findByIdAndUpdate(id, { matchCategory, matchFighterA , matchFighterB , matchName , matchDescription }, { new: true });
+
+      if (!match) {
+          return res.status(404).json({ message: 'Match not found' });
+      }
+
+      res.status(200).json({ message: 'Match updated successfully', match });
+  } catch (error) {
+      console.error('Error updating Match:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+
+app.get('/match/:objectId', async (req, res) => {
+  const { objectId } = req.params;
+
+  try {
+    const user = await Match.findById(objectId);
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: 'Match not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+
+
+
 app.get('/match', async (req, res) => {
   const match = await Match.find();
   res.send(match);
@@ -189,6 +264,55 @@ app.post('/addCategory', async (req, res) => {
 
 
 
+app.delete('/categorytodelete/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log('Received DELETE request for Category ID:', id);
+  try {
+    const category = await Category.findByIdAndDelete(id);
+    
+    res.status(200).json({ message: 'Category deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.put('/categorytoupdate/:id', async (req, res) => {
+  const { id } = req.params;
+  const { category } = req.body;
+
+  try {
+      const categorys = await Category.findByIdAndUpdate(id, { category }, { new: true });
+
+      if (!categorys) {
+          return res.status(404).json({ message: 'Category not found' });
+      }
+
+      res.status(200).json({ message: 'Category updated successfully', categorys });
+  } catch (error) {
+      console.error('Error updating Category:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+
+app.get('/category/:objectId', async (req, res) => {
+  const { objectId } = req.params;
+
+  try {
+    const user = await Category.findById(objectId);
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: 'Category not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 
 app.get('/category', async (req, res) => {
   const category = await Category.find();
@@ -221,6 +345,55 @@ app.post('/addCombat', async (req, res) => {
   res.status(200).send('Combat Added Successfully');
 });
 
+
+
+app.delete('/combattodelete/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log('Received DELETE request for Combat ID:', id);
+  try {
+    const combat = await Combat.findByIdAndDelete(id);
+    
+    res.status(200).json({ message: 'Combat deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.put('/combattoupdate/:id', async (req, res) => {
+  const { id } = req.params;
+  const {  category, attackName, attackDamage, attackKey } = req.body;
+
+  try {
+      const fighter = await Combat.findByIdAndUpdate(id, {  category, attackName, attackDamage, attackKey }, { new: true });
+
+      if (!fighter) {
+          return res.status(404).json({ message: 'Combat not found' });
+      }
+
+      res.status(200).json({ message: 'Combat updated successfully', fighter });
+  } catch (error) {
+      console.error('Error updating Combat:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+
+app.get('/combat/:objectId', async (req, res) => {
+  const { objectId } = req.params;
+
+  try {
+    const user = await Combat.findById(objectId);
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: 'Combat not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 
