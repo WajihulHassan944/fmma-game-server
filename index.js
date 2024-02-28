@@ -88,13 +88,13 @@ app.get('/blog/:objectId', async (req, res) => {
 });
 
 
-app.delete('/blogtodelete/:id', async (req, res) => {
+app.delete('/fightertodelete/:id', async (req, res) => {
   const { id } = req.params;
-  console.log('Received DELETE request for blog ID:', id);
+  console.log('Received DELETE request for fighter ID:', id);
   try {
-    const blog = await Image.findByIdAndDelete(id);
+    const fighter = await Fighter.findByIdAndDelete(id);
     
-    res.status(200).json({ message: 'Data deleted successfully' });
+    res.status(200).json({ message: 'Fighter deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
