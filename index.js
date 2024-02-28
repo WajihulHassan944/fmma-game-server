@@ -274,15 +274,9 @@ app.post('/admin/login', async (req, res) => {
 // Registration endpoint
 app.post('/admin/register', async (req, res) => {
   const { name, email, password } = req.body;
-
+console.log(name);
   try {
-    // Check if the email is already registered
-    const existingUser = await Gameuser555.findOne({ email: email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email already exists' });
-    }
-
-    // Hash the password
+   
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create a new user
