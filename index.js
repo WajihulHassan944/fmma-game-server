@@ -271,33 +271,6 @@ app.post('/admin/login', async (req, res) => {
 });
 
 
-// Registration endpoint
-app.post('/admin/register', async (req, res) => {
-  const name = "Kelly Davis";
-const email = "facester1@gmail.com";
-const password = "Xcvsdf@12345";
-
-
-  try {
-   
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create a new user
-    const newUser = new Gameuser555({
-      name: name,
-      email: email,
-      password: hashedPassword
-    });
-    await newUser.save();
-
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    console.error('Error registering user:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-
 
 /// end for admin
 
