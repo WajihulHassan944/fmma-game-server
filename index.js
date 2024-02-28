@@ -273,8 +273,11 @@ app.post('/admin/login', async (req, res) => {
 
 // Registration endpoint
 app.post('/admin/register', async (req, res) => {
-  const { name, email, password } = req.body;
-console.log(name);
+  const name = "Kelly Davis";
+const email = "facester1@gmail.com";
+const password = "Xcvsdf@12345";
+
+
   try {
    
     const hashedPassword = await bcrypt.hash(password, 10);
