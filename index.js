@@ -146,7 +146,9 @@ const matchSchema = new mongoose.Schema({
     matchName: String ,
      matchDescription: String ,
       matchVideoUrl: String , 
-      matchLive: String
+      matchLive: String,
+      matchDate: Date,
+      matchStatus: String
 });
 
 const Match = mongoose.model('Match', matchSchema);
@@ -164,10 +166,10 @@ app.post('/addMatch', upload.single('image'), async (req, res) => {
   const data = await response.json();
 
   const imageUrl = data.data.url;
-  const { matchCategory, matchFighterA , matchFighterB , matchName , matchDescription , matchVideoUrl , matchLive } = req.body; // Destructure title and text from req.body
+  const { matchCategory, matchFighterA , matchFighterB , matchName , matchDescription , matchVideoUrl , matchLive , matchDate, matchStatus} = req.body; // Destructure title and text from req.body
 
   // Save the image URL, title, and text to the database
-  const newMatch = new Match({ url: imageUrl, matchCategory:matchCategory, matchFighterA:matchFighterA , matchFighterB:matchFighterB , matchName:matchName , matchDescription:matchDescription , matchVideoUrl:matchVideoUrl , matchLive:matchLive });
+  const newMatch = new Match({ url: imageUrl, matchCategory:matchCategory, matchFighterA:matchFighterA , matchFighterB:matchFighterB , matchName:matchName , matchDescription:matchDescription , matchVideoUrl:matchVideoUrl , matchLive:matchLive, matchDate:matchDate, matchStatus:matchStatus });
   await newMatch.save();
   res.status(200).send('Match Added Successfully');
 });
