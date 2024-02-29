@@ -226,6 +226,24 @@ app.put('/matchtoupdate/:id', async (req, res) => {
 
 
 
+app.put('/matchToUpdateStatus/:id', async (req, res) => {
+  const { id } = req.params;
+  const { matchStatus  } = req.body;
+  try {
+      const match = await Match.findByIdAndUpdate(id, { matchStatus }, { new: true });
+
+      if (!match) {
+          return res.status(404).json({ message: 'Match not found' });
+      }
+
+      res.status(200).json({ message: 'Match status updated successfully', match });
+  } catch (error) {
+      console.error('Error updating Match status:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 
 app.get('/match/:objectId', async (req, res) => {
   const { objectId } = req.params;
