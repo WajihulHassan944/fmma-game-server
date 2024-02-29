@@ -157,15 +157,36 @@ app.get('/fighters', async (req, res) => {
 const matchSchema = new mongoose.Schema({
   url: String,
   matchCategory: String,
-   matchFighterA: String , 
-   matchFighterB: String ,
-    matchName: String ,
-     matchDescription: String ,
-      matchVideoUrl: String , 
-      matchLive: String,
-      matchDate: Date,
-      matchStatus: String
+  matchFighterA: String,
+  matchFighterB: String,
+  matchName: String,
+  matchDescription: String,
+  matchVideoUrl: String,
+  matchLive: String,
+  matchDate: Date,
+  matchStatus: String,
+  fighterOneStats: [{
+    roundNumber: Number,
+    HP: Number,
+    BP: Number,
+    TP: Number,
+    RW: Number,
+    RL: Number,
+    KO: Number,
+    SP: Number
+  }],
+  fighterTwoStats: [{
+    roundNumber: Number,
+    HP: Number,
+    BP: Number,
+    TP: Number,
+    RW: Number,
+    RL: Number,
+    KO: Number,
+    SP: Number
+  }]
 });
+
 
 const Match = mongoose.model('Match', matchSchema);
 
@@ -262,6 +283,33 @@ app.get('/match/:objectId', async (req, res) => {
 
 
 
+app.post('/match/addRoundResults/:id', async (req, res) => {
+  const { id } = req.params;
+  const { fighterOneStats, fighterTwoStats } = req.body;
+
+  try {
+    // Find the match document
+    const match = await Match.findById(id);
+
+    if (!match) {
+      return res.status(404).json({ message: 'Match not found' });
+    }
+
+    // Push round results for Fighter One
+    match.fighterOneStats.push(fighterOneStats);
+
+    // Push round results for Fighter Two
+    match.fighterTwoStats.push(fighterTwoStats);
+
+    // Save the updated match document
+    await match.save();
+
+    res.status(200).json({ message: 'Round results added successfully', match });
+  } catch (error) {
+    console.error('Error adding round results:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 
