@@ -282,7 +282,6 @@ app.get('/match/:objectId', async (req, res) => {
 });
 
 
-
 app.post('/match/addRoundResults/:id', async (req, res) => {
   const { id } = req.params;
   const { fighterOneStats, fighterTwoStats } = req.body;
@@ -295,11 +294,21 @@ app.post('/match/addRoundResults/:id', async (req, res) => {
       return res.status(404).json({ message: 'Match not found' });
     }
 
-    // Push round results for Fighter One
-    match.fighterOneStats.push(fighterOneStats);
+    // Update round results for Fighter One
+    const existingFighterOneRoundIndex = match.fighterOneStats.findIndex(stat => stat.roundNumber === fighterOneStats.roundNumber);
+    if (existingFighterOneRoundIndex !== -1) {
+      match.fighterOneStats[existingFighterOneRoundIndex] = fighterOneStats;
+    } else {
+      match.fighterOneStats.push(fighterOneStats);
+    }
 
-    // Push round results for Fighter Two
-    match.fighterTwoStats.push(fighterTwoStats);
+    // Update round results for Fighter Two
+    const existingFighterTwoRoundIndex = match.fighterTwoStats.findIndex(stat => stat.roundNumber === fighterTwoStats.roundNumber);
+    if (existingFighterTwoRoundIndex !== -1) {
+      match.fighterTwoStats[existingFighterTwoRoundIndex] = fighterTwoStats;
+    } else {
+      match.fighterTwoStats.push(fighterTwoStats);
+    }
 
     // Save the updated match document
     await match.save();
@@ -310,6 +319,7 @@ app.post('/match/addRoundResults/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 
 
