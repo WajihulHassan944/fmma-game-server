@@ -122,6 +122,22 @@ app.get('/fighters/:objectId', async (req, res) => {
 });
 
 
+// API endpoint for fetching fighter details by name
+app.get('/fightersByName/:name', async (req, res) => {
+  const { name } = req.params;
+
+  try {
+      const fighter = await Fighter.findOne({ name: name });
+      if (fighter) {
+          res.status(200).json(fighter);
+      } else {
+          res.status(404).json({ message: 'Fighter not found' });
+      }
+  } catch (error) {
+      console.error('Error fetching fighter details by name:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 app.get('/fighters', async (req, res) => {
