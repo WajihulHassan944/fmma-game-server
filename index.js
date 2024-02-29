@@ -185,6 +185,30 @@ const matchSchema = new mongoose.Schema({
       KO: Number,
       SP: Number
     }]
+  },
+  MmaMatch: {
+    fighterOneStats: [{
+      roundNumber: Number,
+      ST: Number, // Strikes
+      KI: Number, // Kicks
+      KN: Number, // Knees
+      El: Number, // Elbows
+      RW: Number, // Round Winner
+      RL: Number, // Round Loser
+      KO: Number, // Knockout
+      SP: Number
+    }],
+    fighterTwoStats: [{
+      roundNumber: Number,
+      ST: Number, // Strikes
+      KI: Number, // Kicks
+      KN: Number, // Knees
+      El: Number, // Elbows
+      RW: Number, // Round Winner
+      RL: Number, // Round Loser
+      KO: Number, // Knockout
+      SP: Number
+    }]
   }
 });
 
@@ -309,6 +333,45 @@ app.post('/match/addRoundResults/:id', async (req, res) => {
       match.BoxingMatch.fighterTwoStats[existingFighterTwoRoundIndex] = fighterTwoStats;
     } else {
       match.BoxingMatch.fighterTwoStats.push(fighterTwoStats);
+    }
+
+    // Save the updated match document
+    await match.save();
+
+    res.status(200).json({ message: 'Round results added successfully', match });
+  } catch (error) {
+    console.error('Error adding round results:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+app.post('/match/addRoundResultsMMA/:id', async (req, res) => {
+  const { id } = req.params;
+  const { fighterOneStats, fighterTwoStats } = req.body;
+
+  try {
+    // Find the match document
+    const match = await Match.findById(id);
+
+    if (!match) {
+      return res.status(404).json({ message: 'Match not found' });
+    }
+
+    // Update round results for Fighter One
+    const existingFighterOneRoundIndex = match.MmaMatch.fighterOneStats.findIndex(stat => stat.roundNumber === fighterOneStats.roundNumber);
+    if (existingFighterOneRoundIndex !== -1) {
+      match.MmaMatch.fighterOneStats[existingFighterOneRoundIndex] = fighterOneStats;
+    } else {
+      match.MmaMatch.fighterOneStats.push(fighterOneStats);
+    }
+
+    // Update round results for Fighter Two
+    const existingFighterTwoRoundIndex = match.MmaMatch.fighterTwoStats.findIndex(stat => stat.roundNumber === fighterTwoStats.roundNumber);
+    if (existingFighterTwoRoundIndex !== -1) {
+      match.MmaMatch.fighterTwoStats[existingFighterTwoRoundIndex] = fighterTwoStats;
+    } else {
+      match.MmaMatch.fighterTwoStats.push(fighterTwoStats);
     }
 
     // Save the updated match document
