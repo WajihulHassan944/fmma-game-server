@@ -153,7 +153,6 @@ app.get('/fighters', async (req, res) => {
 
 
 // match start
-
 const matchSchema = new mongoose.Schema({
   url: String,
   matchCategory: String,
@@ -165,26 +164,28 @@ const matchSchema = new mongoose.Schema({
   matchLive: String,
   matchDate: Date,
   matchStatus: String,
-  fighterOneStats: [{
-    roundNumber: Number,
-    HP: Number,
-    BP: Number,
-    TP: Number,
-    RW: Number,
-    RL: Number,
-    KO: Number,
-    SP: Number
-  }],
-  fighterTwoStats: [{
-    roundNumber: Number,
-    HP: Number,
-    BP: Number,
-    TP: Number,
-    RW: Number,
-    RL: Number,
-    KO: Number,
-    SP: Number
-  }]
+  BoxingMatch: {
+    fighterOneStats: [{
+      roundNumber: Number,
+      HP: Number,
+      BP: Number,
+      TP: Number,
+      RW: Number,
+      RL: Number,
+      KO: Number,
+      SP: Number
+    }],
+    fighterTwoStats: [{
+      roundNumber: Number,
+      HP: Number,
+      BP: Number,
+      TP: Number,
+      RW: Number,
+      RL: Number,
+      KO: Number,
+      SP: Number
+    }]
+  }
 });
 
 
@@ -295,19 +296,19 @@ app.post('/match/addRoundResults/:id', async (req, res) => {
     }
 
     // Update round results for Fighter One
-    const existingFighterOneRoundIndex = match.fighterOneStats.findIndex(stat => stat.roundNumber === fighterOneStats.roundNumber);
+    const existingFighterOneRoundIndex = match.BoxingMatch.fighterOneStats.findIndex(stat => stat.roundNumber === fighterOneStats.roundNumber);
     if (existingFighterOneRoundIndex !== -1) {
-      match.fighterOneStats[existingFighterOneRoundIndex] = fighterOneStats;
+      match.BoxingMatch.fighterOneStats[existingFighterOneRoundIndex] = fighterOneStats;
     } else {
-      match.fighterOneStats.push(fighterOneStats);
+      match.BoxingMatch.fighterOneStats.push(fighterOneStats);
     }
 
     // Update round results for Fighter Two
-    const existingFighterTwoRoundIndex = match.fighterTwoStats.findIndex(stat => stat.roundNumber === fighterTwoStats.roundNumber);
+    const existingFighterTwoRoundIndex = match.BoxingMatch.fighterTwoStats.findIndex(stat => stat.roundNumber === fighterTwoStats.roundNumber);
     if (existingFighterTwoRoundIndex !== -1) {
-      match.fighterTwoStats[existingFighterTwoRoundIndex] = fighterTwoStats;
+      match.BoxingMatch.fighterTwoStats[existingFighterTwoRoundIndex] = fighterTwoStats;
     } else {
-      match.fighterTwoStats.push(fighterTwoStats);
+      match.BoxingMatch.fighterTwoStats.push(fighterTwoStats);
     }
 
     // Save the updated match document
