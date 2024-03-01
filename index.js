@@ -249,11 +249,10 @@ const matchSchema = new mongoose.Schema({
 
 
 const Match = mongoose.model('Match', matchSchema);
-
 app.post('/match/addBoxingPredictions/:id', async (req, res) => {
   const { id } = req.params;
   const { predictions } = req.body;
-
+console.log(predictions);
   try {
     // Find the match document
     const match = await Match.findById(id);
@@ -269,26 +268,26 @@ app.post('/match/addBoxingPredictions/:id', async (req, res) => {
 
     // Update user predictions for boxing in the match
     predictions.forEach(userPrediction => {
-      const { playerName, boxingPredictions } = userPrediction;
+      const { playerName, predictions } = userPrediction; // Adjusted variable name here
 
       // Find or create the user's predictions object for boxing
       let userBoxingPredictions = match.usersPredictionsBoxing.find(prediction => prediction.playerName === playerName);
 
       // If user boxing predictions is undefined, create a new prediction object
       if (!userBoxingPredictions) {
-        userBoxingPredictions = { playerName, boxingPredictions: [] };
+        userBoxingPredictions = { playerName, predictions: [] }; // Adjusted property name here
         match.usersPredictionsBoxing.push(userBoxingPredictions);
       }
 
       // Add or update boxing predictions
-      if (boxingPredictions && Array.isArray(boxingPredictions) && boxingPredictions.length > 0) {
-        boxingPredictions.forEach(boxingPrediction => {
+      if (predictions && Array.isArray(predictions) && predictions.length > 0) {
+        predictions.forEach(boxingPrediction => {
           const { playerRound } = boxingPrediction;
-          const existingBoxingPredictionIndex = userBoxingPredictions.boxingPredictions.findIndex(prediction => prediction.playerRound === playerRound);
+          const existingBoxingPredictionIndex = userBoxingPredictions.predictions.findIndex(prediction => prediction.playerRound === playerRound); // Adjusted property name here
           if (existingBoxingPredictionIndex !== -1) {
-            userBoxingPredictions.boxingPredictions[existingBoxingPredictionIndex] = boxingPrediction;
+            userBoxingPredictions.predictions[existingBoxingPredictionIndex] = boxingPrediction; // Adjusted property name here
           } else {
-            userBoxingPredictions.boxingPredictions.push(boxingPrediction);
+            userBoxingPredictions.predictions.push(boxingPrediction); // Adjusted property name here
           }
         });
       }
@@ -303,7 +302,6 @@ app.post('/match/addBoxingPredictions/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 
 
 
