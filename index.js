@@ -416,6 +416,7 @@ app.post('/match/addRoundResultsMMA/:id', async (req, res) => {
   }
 });
 
+
 app.post('/match/addPredictions/:id', async (req, res) => {
   const { id } = req.params;
   const { predictions } = req.body;
@@ -455,6 +456,11 @@ app.post('/match/addPredictions/:id', async (req, res) => {
       if (predictionsForBoxing && Array.isArray(predictionsForBoxing) && predictionsForBoxing.length > 0) {
         predictionsForBoxing.forEach(boxingPrediction => {
           const { playerRound } = boxingPrediction;
+          console.log('Player round:', playerRound);
+          if (!userPredictions.predictionsForBoxing) {
+            console.log('predictionsForBoxing is undefined. Initializing to an empty array.');
+            userPredictions.predictionsForBoxing = [];
+          }
           const existingBoxingPredictionIndex = userPredictions.predictionsForBoxing.findIndex(prediction => prediction.playerRound === playerRound);
           if (existingBoxingPredictionIndex !== -1) {
             userPredictions.predictionsForBoxing[existingBoxingPredictionIndex] = boxingPrediction;
@@ -468,6 +474,11 @@ app.post('/match/addPredictions/:id', async (req, res) => {
       if (predictionsForMMA && Array.isArray(predictionsForMMA) && predictionsForMMA.length > 0) {
         predictionsForMMA.forEach(mmaPrediction => {
           const { playerRound } = mmaPrediction;
+          console.log('Player round:', playerRound);
+          if (!userPredictions.predictionsForMMA) {
+            console.log('predictionsForMMA is undefined. Initializing to an empty array.');
+            userPredictions.predictionsForMMA = [];
+          }
           const existingMMAPredictionIndex = userPredictions.predictionsForMMA.findIndex(prediction => prediction.playerRound === playerRound);
           if (existingMMAPredictionIndex !== -1) {
             userPredictions.predictionsForMMA[existingMMAPredictionIndex] = mmaPrediction;
