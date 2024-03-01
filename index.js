@@ -211,9 +211,9 @@ const matchSchema = new mongoose.Schema({
       SP: Number
     }]
   },
-  usersPredictions: [{
+  usersPredictionsBoxing: [{
     playerName: String,
-    PredictionsForBoxing: [{
+    predictions: [{
       playerRound: Number,
       hpPrediction1: Number,
       hpPrediction2: Number,
@@ -225,8 +225,11 @@ const matchSchema = new mongoose.Schema({
       rwPrediction2: Number,
       koPrediction1: Number,
       koPrediction2: Number,
-    }],
-    PredictionsForMMA: [{
+    }]
+  }],
+  usersPredictionsMMA: [{
+    playerName: String,
+    predictions: [{
       playerRound: Number,
       stPrediction1: Number,
       stPrediction2: Number,
@@ -246,6 +249,67 @@ const matchSchema = new mongoose.Schema({
 
 
 const Match = mongoose.model('Match', matchSchema);
+
+app.post('/match/addBoxingPredictions/:id', async (req, res) => {
+  const { id } = req.params;
+  const { predictions } = req.body;
+
+  try {
+    // Find the match document
+    const match = await Match.findById(id);
+
+    if (!match) {
+      return res.status(404).json({ message: 'Match not found' });
+    }
+
+    // Validate the incoming predictions
+    if (!predictions || !Array.isArray(predictions) || predictions.length === 0) {
+      return res.status(400).json({ message: 'Invalid predictions format' });
+    }
+
+    // Update user predictions for boxing in the match
+    predictions.forEach(userPrediction => {
+      const { playerName, boxingPredictions } = userPrediction;
+
+      // Find or create the user's predictions object for boxing
+      let userBoxingPredictions = match.usersPredictionsBoxing.find(prediction => prediction.playerName === playerName);
+
+      // If user boxing predictions is undefined, create a new prediction object
+      if (!userBoxingPredictions) {
+        userBoxingPredictions = { playerName, boxingPredictions: [] };
+        match.usersPredictionsBoxing.push(userBoxingPredictions);
+      }
+
+      // Add or update boxing predictions
+      if (boxingPredictions && Array.isArray(boxingPredictions) && boxingPredictions.length > 0) {
+        boxingPredictions.forEach(boxingPrediction => {
+          const { playerRound } = boxingPrediction;
+          const existingBoxingPredictionIndex = userBoxingPredictions.boxingPredictions.findIndex(prediction => prediction.playerRound === playerRound);
+          if (existingBoxingPredictionIndex !== -1) {
+            userBoxingPredictions.boxingPredictions[existingBoxingPredictionIndex] = boxingPrediction;
+          } else {
+            userBoxingPredictions.boxingPredictions.push(boxingPrediction);
+          }
+        });
+      }
+    });
+
+    // Save the updated match document
+    await match.save();
+
+    res.status(200).json({ message: 'Boxing predictions added successfully', match });
+  } catch (error) {
+    console.error('Error adding boxing predictions:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+
+
+
+
 
 app.post('/addMatch', upload.single('image'), async (req, res) => {
   const formData = new FormData();
@@ -416,93 +480,6 @@ app.post('/match/addRoundResultsMMA/:id', async (req, res) => {
   }
 });
 
-
-app.post('/match/addPredictions/:id', async (req, res) => {
-  const { id } = req.params;
-  const { predictions } = req.body;
-console.log(predictions);
-  try {
-    // Find the match document
-    const match = await Match.findById(id);
-
-    if (!match) {
-      return res.status(404).json({ message: 'Match not found' });
-    }
-
-    // Validate the incoming predictions
-    if (!predictions || !Array.isArray(predictions) || predictions.length === 0) {
-      return res.status(400).json({ message: 'Invalid predictions format' });
-    }
-
-    // Update user predictions for the match
-    predictions.forEach(userPrediction => {
-      const { playerName, PredictionsForBoxing, PredictionsForMMA } = userPrediction; // Updated field names
-console.log(playerName);
-
-      console.log(PredictionsForBoxing);
-
-      // Find or create the user's predictions object
-      let userPredictions = match.usersPredictions.find(prediction => prediction.playerName === playerName);
-      console.log('Existing userPredictions:', userPredictions);
-      
-      // If userPredictions is undefined, create a new prediction object
-      if (!userPredictions) {
-        console.log('UserPredictions is undefined. Creating a new prediction object.');
-        userPredictions = { playerName, PredictionsForBoxing: [], PredictionsForMMA: [] }; // Updated field names
-        match.usersPredictions.push(userPredictions);
-        console.log('New userPredictions:', userPredictions);
-      }
-
-      // Add or update Boxing predictions
-      if (PredictionsForBoxing && Array.isArray(PredictionsForBoxing)) { // Updated field name
-        if (!userPredictions.PredictionsForBoxing) { // Updated field name
-          console.log('PredictionsForBoxing is undefined. Initializing to an empty array.'); // Updated field name
-          userPredictions.PredictionsForBoxing = []; // Updated field name
-        }
-
-        PredictionsForBoxing.forEach(boxingPrediction => {
-          const { playerRound } = boxingPrediction;
-          console.log('Player round:', playerRound);
-
-          const existingBoxingPredictionIndex = userPredictions.PredictionsForBoxing.findIndex(prediction => prediction.playerRound === playerRound); // Updated field name
-          if (existingBoxingPredictionIndex !== -1) {
-            userPredictions.PredictionsForBoxing[existingBoxingPredictionIndex] = boxingPrediction; // Updated field name
-          } else {
-            userPredictions.PredictionsForBoxing.push(boxingPrediction); // Updated field name
-          }
-        });
-      }
-
-      // Add or update MMA predictions
-      if (PredictionsForMMA && Array.isArray(PredictionsForMMA)) { // Updated field name
-        if (!userPredictions.PredictionsForMMA) { // Updated field name
-          console.log('PredictionsForMMA is undefined. Initializing to an empty array.'); // Updated field name
-          userPredictions.PredictionsForMMA = []; // Updated field name
-        }
-
-        PredictionsForMMA.forEach(mmaPrediction => {
-          const { playerRound } = mmaPrediction;
-          console.log('Player round:', playerRound);
-
-          const existingMMAPredictionIndex = userPredictions.PredictionsForMMA.findIndex(prediction => prediction.playerRound === playerRound); // Updated field name
-          if (existingMMAPredictionIndex !== -1) {
-            userPredictions.PredictionsForMMA[existingMMAPredictionIndex] = mmaPrediction; // Updated field name
-          } else {
-            userPredictions.PredictionsForMMA.push(mmaPrediction); // Updated field name
-          }
-        });
-      }
-    });
-
-    // Save the updated match document
-    await match.save();
-
-    res.status(200).json({ message: 'Predictions added successfully', match });
-  } catch (error) {
-    console.error('Error adding predictions:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
 
 
 
