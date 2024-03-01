@@ -440,6 +440,8 @@ app.post('/match/addPredictions/:id', async (req, res) => {
 
       // Find or create the user's predictions object
       let userPredictions = match.usersPredictions.find(prediction => prediction.playerName === playerName);
+      
+      // If userPredictions is undefined, create a new prediction object
       if (!userPredictions) {
         userPredictions = { playerName, predictionsForBoxing: [], predictionsForMMA: [] };
         match.usersPredictions.push(userPredictions);
@@ -481,8 +483,6 @@ app.post('/match/addPredictions/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
-
 
 
 
