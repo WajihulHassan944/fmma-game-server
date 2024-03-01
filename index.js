@@ -416,7 +416,6 @@ app.post('/match/addRoundResultsMMA/:id', async (req, res) => {
   }
 });
 
-
 app.post('/match/addPredictions/:id', async (req, res) => {
   const { id } = req.params;
   const { predictions } = req.body;
@@ -438,13 +437,18 @@ app.post('/match/addPredictions/:id', async (req, res) => {
     predictions.forEach(userPrediction => {
       const { playerName, predictionsForBoxing, predictionsForMMA } = userPrediction;
 
+      console.log(`Processing predictions for user: ${playerName}`);
+
       // Find or create the user's predictions object
       let userPredictions = match.usersPredictions.find(prediction => prediction.playerName === playerName);
+      console.log('Existing userPredictions:', userPredictions);
       
       // If userPredictions is undefined, create a new prediction object
       if (!userPredictions) {
+        console.log('UserPredictions is undefined. Creating a new prediction object.');
         userPredictions = { playerName, predictionsForBoxing: [], predictionsForMMA: [] };
         match.usersPredictions.push(userPredictions);
+        console.log('New userPredictions:', userPredictions);
       }
 
       // Add or update Boxing predictions
@@ -483,7 +487,6 @@ app.post('/match/addPredictions/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 
 
 app.get('/match', async (req, res) => {
