@@ -210,95 +210,11 @@ const matchSchema = new mongoose.Schema({
       KO: Number, // Knockout
       SP: Number
     }]
-  },
-  usersPredictionsBoxing: [{
-    playerName: String,
-    predictions: [{
-      playerRound: Number,
-      hpPrediction1: Number,
-      hpPrediction2: Number,
-      bpPrediction1: Number,
-      bpPrediction2: Number,
-      tpPrediction1: Number,
-      tpPrediction2: Number,
-      rwPrediction1: Number,
-      rwPrediction2: Number,
-      koPrediction1: Number,
-      koPrediction2: Number,
-    }]
-  }],
-  usersPredictionsMMA: [{
-    playerName: String,
-    predictions: [{
-      playerRound: Number,
-      stPrediction1: Number,
-      stPrediction2: Number,
-      kiPrediction1: Number,
-      kiPrediction2: Number,
-      knPrediction1: Number,
-      knPrediction2: Number,
-      elPrediction1: Number,
-      elPrediction2: Number,
-      spPrediction1: Number,
-      spPrediction2: Number,
-      rwPrediction1: Number,
-      rwPrediction2: Number,
-    }]
-  }]
-});
-
-
-const Match = mongoose.model('Match', matchSchema);
-
-
-app.post('/match/addBoxingPredictions/:id', async (req, res) => {
-  const { id } = req.params;
-  const { playerName, playerRound, hpPrediction1, hpPrediction2, bpPrediction1, bpPrediction2, tpPrediction1, tpPrediction2, rwPrediction1, rwPrediction2, koPrediction1, koPrediction2 } = req.body;
-
-  try {
-    // Find the match document
-    const match = await Match.findById(id);
-
-    if (!match) {
-      return res.status(404).json({ message: 'Match not found' });
-    }
-
-    // Validate the incoming data
-    if (!playerName || !playerRound || !hpPrediction1 || !hpPrediction2 || !bpPrediction1 || !bpPrediction2 || !tpPrediction1 || !tpPrediction2 || !rwPrediction1 || !rwPrediction2 || !koPrediction1 || !koPrediction2) {
-      return res.status(400).json({ message: 'Incomplete data' });
-    }
-
-    // Find or create the user's predictions object for boxing
-    let userBoxingPredictions = match.usersPredictionsBoxing.find(prediction => prediction.playerName === playerName);
-
-    // If user boxing predictions is undefined, create a new prediction object
-    if (!userBoxingPredictions) {
-      userBoxingPredictions = { playerName, predictions: [] };
-      match.usersPredictionsBoxing.push(userBoxingPredictions);
-    }
-
-    // Add or update boxing predictions for the current round
-    const roundPredictionIndex = userBoxingPredictions.predictions.findIndex(prediction => prediction.playerRound === playerRound);
-    if (roundPredictionIndex !== -1) {
-      // Update existing round prediction
-      userBoxingPredictions.predictions[roundPredictionIndex] = { playerRound, hpPrediction1, hpPrediction2, bpPrediction1, bpPrediction2, tpPrediction1, tpPrediction2, rwPrediction1, rwPrediction2, koPrediction1, koPrediction2 };
-    } else {
-      // Add new round prediction
-      userBoxingPredictions.predictions.push({ playerRound, hpPrediction1, hpPrediction2, bpPrediction1, bpPrediction2, tpPrediction1, tpPrediction2, rwPrediction1, rwPrediction2, koPrediction1, koPrediction2 });
-    }
-
-    // Save the updated match document
-    await match.save();
-
-    res.status(200).json({ message: 'Boxing predictions added successfully', match });
-  } catch (error) {
-    console.error('Error adding boxing predictions:', error);
-    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
 
-
+const Match = mongoose.model('Match', matchSchema);
 
 
 app.post('/addMatch', upload.single('image'), async (req, res) => {
