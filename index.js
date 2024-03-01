@@ -249,10 +249,12 @@ const matchSchema = new mongoose.Schema({
 
 
 const Match = mongoose.model('Match', matchSchema);
+
+
 app.post('/match/addBoxingPredictions/:id', async (req, res) => {
   const { id } = req.params;
-  const { predictions } = req.body;
-console.log(predictions);
+  const { playerName, playerRound, hpPrediction1, hpPrediction2, bpPrediction1, bpPrediction2, tpPrediction1, tpPrediction2, rwPrediction1, rwPrediction2, koPrediction1, koPrediction2 } = req.body;
+
   try {
     // Find the match document
     const match = await Match.findById(id);
@@ -261,37 +263,29 @@ console.log(predictions);
       return res.status(404).json({ message: 'Match not found' });
     }
 
-    // Validate the incoming predictions
-    if (!predictions || !Array.isArray(predictions) || predictions.length === 0) {
-      return res.status(400).json({ message: 'Invalid predictions format' });
+    // Validate the incoming data
+    if (!playerName || !playerRound || !hpPrediction1 || !hpPrediction2 || !bpPrediction1 || !bpPrediction2 || !tpPrediction1 || !tpPrediction2 || !rwPrediction1 || !rwPrediction2 || !koPrediction1 || !koPrediction2) {
+      return res.status(400).json({ message: 'Incomplete data' });
     }
 
-    // Update user predictions for boxing in the match
-    predictions.forEach(userPrediction => {
-      const { playerName, predictions } = userPrediction; // Adjusted variable name here
+    // Find or create the user's predictions object for boxing
+    let userBoxingPredictions = match.usersPredictionsBoxing.find(prediction => prediction.playerName === playerName);
 
-      // Find or create the user's predictions object for boxing
-      let userBoxingPredictions = match.usersPredictionsBoxing.find(prediction => prediction.playerName === playerName);
+    // If user boxing predictions is undefined, create a new prediction object
+    if (!userBoxingPredictions) {
+      userBoxingPredictions = { playerName, predictions: [] };
+      match.usersPredictionsBoxing.push(userBoxingPredictions);
+    }
 
-      // If user boxing predictions is undefined, create a new prediction object
-      if (!userBoxingPredictions) {
-        userBoxingPredictions = { playerName, predictions: [] }; // Adjusted property name here
-        match.usersPredictionsBoxing.push(userBoxingPredictions);
-      }
-
-      // Add or update boxing predictions
-      if (predictions && Array.isArray(predictions) && predictions.length > 0) {
-        predictions.forEach(boxingPrediction => {
-          const { playerRound } = boxingPrediction;
-          const existingBoxingPredictionIndex = userBoxingPredictions.predictions.findIndex(prediction => prediction.playerRound === playerRound); // Adjusted property name here
-          if (existingBoxingPredictionIndex !== -1) {
-            userBoxingPredictions.predictions[existingBoxingPredictionIndex] = boxingPrediction; // Adjusted property name here
-          } else {
-            userBoxingPredictions.predictions.push(boxingPrediction); // Adjusted property name here
-          }
-        });
-      }
-    });
+    // Add or update boxing predictions for the current round
+    const roundPredictionIndex = userBoxingPredictions.predictions.findIndex(prediction => prediction.playerRound === playerRound);
+    if (roundPredictionIndex !== -1) {
+      // Update existing round prediction
+      userBoxingPredictions.predictions[roundPredictionIndex] = { playerRound, hpPrediction1, hpPrediction2, bpPrediction1, bpPrediction2, tpPrediction1, tpPrediction2, rwPrediction1, rwPrediction2, koPrediction1, koPrediction2 };
+    } else {
+      // Add new round prediction
+      userBoxingPredictions.predictions.push({ playerRound, hpPrediction1, hpPrediction2, bpPrediction1, bpPrediction2, tpPrediction1, tpPrediction2, rwPrediction1, rwPrediction2, koPrediction1, koPrediction2 });
+    }
 
     // Save the updated match document
     await match.save();
@@ -302,8 +296,6 @@ console.log(predictions);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
-
 
 
 
